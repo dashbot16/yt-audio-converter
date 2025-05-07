@@ -29,7 +29,8 @@ AudioSegment.converter = which("ffmpeg")
 
 app = Flask(__name__)
 Talisman(app, content_security_policy=None)  # Enforce HTTPS and security headers
-limiter = Limiter(app, key_func=get_remote_address)  # IP-based rate limiting
+limiter = Limiter(key_func=get_remote_address)
+limiter.init_app(app)
 CORS(app)
 
 
@@ -201,7 +202,8 @@ if __name__ == '__main__':
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
-    if path != "" and os.path.exists("frontend/dist" + path):
+    target = os.path.join("frontend/dist", path)
+    if path != "" and os.path.exists(target):
         return send_from_directory('frontend/dist', path)
     else:
         return send_from_directory('frontend/dist', 'index.html')
