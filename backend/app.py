@@ -199,11 +199,16 @@ if __name__ == '__main__':
     Thread(target=cleanup_old_files, daemon=True).start()
     app.run(debug=True)
 
+from flask import Flask, request, send_from_directory
+import os
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
-    target = os.path.join("frontend/dist", path)
-    if path != "" and os.path.exists(target):
-        return send_from_directory('frontend/dist', path)
+    dist_dir = os.path.join(os.getcwd(), "frontend", "dist")
+    file_path = os.path.join(dist_dir, path)
+
+    if path != "" and os.path.exists(file_path):
+        return send_from_directory(dist_dir, path)
     else:
-        return send_from_directory('frontend/dist', 'index.html')
+        return send_from_directory(dist_dir, "index.html")
